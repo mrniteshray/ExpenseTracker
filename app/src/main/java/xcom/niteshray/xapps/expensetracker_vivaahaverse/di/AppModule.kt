@@ -54,7 +54,7 @@ object NetworkModule {
     ): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.3:8000/")
+            .baseUrl("https://expensetracker-p775.onrender.com")
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()

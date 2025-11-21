@@ -13,12 +13,32 @@ import os
 
 # Initialize Firebase
 if not firebase_admin._apps:
-    cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH", "./serviceAccountKey.json")
-    if os.path.exists(cred_path):
+    # Try multiple paths for the credentials file
+    cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
+    
+    if not cred_path:
+        # Try different possible locations
+        possible_paths = [
+            "/etc/secrets/serviceAccountKey.json",  # Render secret file location
+            "./serviceAccountKey.json",              # Local development
+            "../serviceAccountKey.json",             # One level up
+            "ExpenseTrackerBackend/serviceAccountKey.json"  # From root
+        ]
+        for path in possible_paths:
+            if os.path.exists(path):
+                cred_path = path
+                break
+    
+    if cred_path and os.path.exists(cred_path):
         cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
     else:
-        cred = credentials.ApplicationDefault()
-    firebase_admin.initialize_app(cred)
+        # This will fail and show error message
+        raise FileNotFoundError(
+            "Firebase credentials not found! "
+            "Please upload serviceAccountKey.json as a Secret File in Render. "
+            f"Tried paths: {possible_paths}"
+        )
 
 db = firestore.client()
 
