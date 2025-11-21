@@ -100,6 +100,11 @@ fun ExpenseTrackerApp(
                 },
                 onNavigateToDashboard = {
                     navController.navigate(Screen.Dashboard.route)
+                },
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }
